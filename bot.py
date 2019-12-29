@@ -6,8 +6,12 @@ class Card():
     def __init__(self,key):
         self.key=key
 
-    def OpenAction(self):
+    def OpenAction(self,update,context,chatid,posY,posX,content,name,game):
+        context.bot.send_message(chat_id=chatid,text="{} has opened {}".format(name,self.key))
+        game.ContinueTurn(update,context,chatid,posY,posX,content)
         return
+
+    
 
 
 class DeadManDrawGame():
@@ -17,37 +21,59 @@ class DeadManDrawGame():
         gameData[str(chatid)]["JoinListName"]=[]
         gameData[str(chatid)]["StartingGame"]=False
         gameData[str(chatid)]["CurrentPlayer"]=0
+        gameData[str(chatid)]["CardsPile"]=[]
+        gameData[str(chatid)]["CardsOutside"]=[]
         context.bot.send_message(chat_id=chatid,text="(press /join to join game)")
         return
 
     # ----- Game Logic ----- #
     def GenerateCards(self):
         deck=[]
-        deck.append(Card("A1"))
         deck.append(Card("A2"))
         deck.append(Card("A3"))
         deck.append(Card("A4"))
+        deck.append(Card("A5"))
+        
         random.shuffle(deck)
         return deck
 
     def InitializeCardInfo(self,update,context,chatid,posY,posX,content):
         # Shuffle cards, pick a starting guy #
         gameData[str(chatid)]["CurrentPlayer"]=0
-        gameData[str(chatid)]["Cards"]=self.GenerateCards()
+        gameData[str(chatid)]["CardsPile"]=self.GenerateCards()
         context.bot.send_message(chat_id=chatid,text="Picked player {} as first player".format(gameData[str(chatid)]["JoinListName"][gameData[str(chatid)]["CurrentPlayer"]]))
         return
 
     def StartTurn(self,update,context,chatid,posY,posX,content):
+        # ask to draw a card #
+        gameData[str(chatid)]["CardsOutside"]=[]
+        sendButton(context,update,chatid,"Player {} draw your card".format(gameData[str(chatid)]["JoinListName"][gameData[str(chatid)]["CurrentPlayer"]]),CALLBACKKEY_DRAWCARD,[["Draw Card"]])
+        return
+
+    def ContinueTurn(self,update,context,chatid,posY,posX,content):
         # ask to draw a card #
         sendButton(context,update,chatid,"Player {} draw your card, or give up".format(gameData[str(chatid)]["JoinListName"][gameData[str(chatid)]["CurrentPlayer"]]),CALLBACKKEY_DRAWCARD,[["Draw Card"],["Give Up"]])
         return
     
     def OpenCard(self,update,context,chatid,posY,posX,content,fromid):
         # find any thing to do after opened card #
-        print(gameData[str(chatid)]["Cards"][0])
-        context.bot.send_message(chat_id=chatid,text="Open Card")
+        context.bot.send_message(chat_id=chatid,text="Opened Card"+gameData[str(chatid)]["CardsPile"][0].key)
+        # TODO: Add to card deck and check icon same or not #
+        gotCard=gameData[str(chatid)]["CardsPile"].pop(0)
+        gameData[str(chatid)]["CardsOutside"].append(gotCard)
+        gotCard.OpenAction(update,context,chatid,posY,posX,content,gameData[str(chatid)]["JoinListName"][gameData[str(chatid)]["CurrentPlayer"]],self)
+        
         return
-    
+
+    def GiveUp(self,update,context,chatid,posY,posX,content,fromid):
+        # Collect all card to deck #
+        
+        return
+
+    def NextPlayer(self,update,context,chatid,posY,posX,content,fromid):
+        # Call next player to next turn
+
+        return
 
     # ---- Tools ----- #
     def StartGame(self,update,context):
@@ -72,6 +98,12 @@ class DeadManDrawGame():
         else:
             context.bot.send_message(chat_id=chatid,text="Game Started, Wait for next game")
 
+    def showCardList(self,listOfCard):
+        s=""
+        for i in listOfCard:
+            s=s+i.key+" "
+        context.bot.send_message(chat_id=chatid,text="Card Outside:\n{}".format(s))
+
     def ReadyGame(self,update,context,chatid,posY,posX,content,fromid):
         gameData[str(chatid)]["StartingGame"]=True
         self.InitializeCardInfo(update,context,chatid,posY,posX,content)
@@ -83,11 +115,17 @@ class DeadManDrawGame():
         return
 
     def DrawCard(self,update,context,chatid,posY,posX,content,fromid):
+        
         if(fromid==gameData[str(chatid)]["JoinList"][gameData[str(chatid)]["CurrentPlayer"]]):
-            self.OpenCard(update,context,chatid,posY,posX,content,fromid)
-            return True,"Drawed card"
+            if(content=="Draw Card"):
+                self.OpenCard(update,context,chatid,posY,posX,content,fromid)
+                return True,"Drawed card"
+            elif(content=="Give Up"):
+                self.GiveUp(update,context,chatid,posY,posX,content,fromid)
+                return True,"Next Player"
         else:
             return False,"" 
+        
     
     
     
