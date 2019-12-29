@@ -1,7 +1,13 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 import logging
+import random
+class Card():
+    def __init__(self,key):
+        self.key=key
 
+    def OpenAction(self):
+        return
 
 
 class DeadManDrawGame():
@@ -10,23 +16,35 @@ class DeadManDrawGame():
         gameData[str(chatid)]["JoinList"]=[]
         gameData[str(chatid)]["JoinListName"]=[]
         gameData[str(chatid)]["StartingGame"]=False
+        gameData[str(chatid)]["CurrentPlayer"]=0
         context.bot.send_message(chat_id=chatid,text="(press /join to join game)")
         return
 
     # ----- Game Logic ----- #
+    def GenerateCards(self):
+        deck=[]
+        deck.append(Card("A1"))
+        deck.append(Card("A2"))
+        deck.append(Card("A3"))
+        deck.append(Card("A4"))
+        random.shuffle(deck)
+        return deck
 
     def InitializeCardInfo(self,update,context,chatid,posY,posX,content):
-        # Start cards, pick a starting guy #
-        context.bot.send_message(chat_id=chatid,text="Picked player X as first player")
+        # Shuffle cards, pick a starting guy #
+        gameData[str(chatid)]["CurrentPlayer"]=0
+        gameData[str(chatid)]["Cards"]=self.GenerateCards()
+        context.bot.send_message(chat_id=chatid,text="Picked player {} as first player".format(gameData[str(chatid)]["JoinListName"][gameData[str(chatid)]["CurrentPlayer"]]))
         return
 
     def StartTurn(self,update,context,chatid,posY,posX,content):
         # ask to draw a card #
-        context.bot.send_message(chat_id=chatid,text="Player X draw your card, or give up")
+        sendButton(context,update,chatid,"Player {} draw your card, or give up".format(gameData[str(chatid)]["JoinListName"][gameData[str(chatid)]["CurrentPlayer"]]),CALLBACKKEY_DRAWCARD,[["Draw Card"],["Give Up"]])
         return
     
-    def OpenCard(self,update,context,chatid,posY,posX,content):
+    def OpenCard(self,update,context,chatid,posY,posX,content,fromid):
         # find any thing to do after opened card #
+        print(gameData[str(chatid)]["Cards"][0])
         context.bot.send_message(chat_id=chatid,text="Open Card")
         return
     
@@ -54,16 +72,22 @@ class DeadManDrawGame():
         else:
             context.bot.send_message(chat_id=chatid,text="Game Started, Wait for next game")
 
-    def ReadyGame(self,update,context,chatid,posY,posX,content):
-        context.bot.send_message(chat_id=chatid,text="Game Started")
+    def ReadyGame(self,update,context,chatid,posY,posX,content,fromid):
         gameData[str(chatid)]["StartingGame"]=True
         self.InitializeCardInfo(update,context,chatid,posY,posX,content)
         self.StartTurn(update,context,chatid,posY,posX,content)
+        return True,"Game Start!"
 
-    def ClickedOpenedCard(self,update,context,chatid,posY,posX,content):
+    def ClickedOpenedCard(self,update,context,chatid,posY,posX,content,fromid):
         self.OpenCard(update,context,chatid,posY,posX,content)
         return
-    
+
+    def DrawCard(self,update,context,chatid,posY,posX,content,fromid):
+        if(fromid==gameData[str(chatid)]["JoinList"][gameData[str(chatid)]["CurrentPlayer"]]):
+            self.OpenCard(update,context,chatid,posY,posX,content,fromid)
+            return True,"Drawed card"
+        else:
+            return False,"" 
     
     
     
@@ -75,6 +99,7 @@ class Games():
 
 CALLBACKKEY_CHOOSEGAME="Choose Game"
 CALLBACKKEY_READYSTART="Ready Start"
+CALLBACKKEY_DRAWCARD="Draw Card"
 
 GAMEDATA_CURRENT_GAME="Current Game"
 # ----- Bot Status ----- #
@@ -107,11 +132,10 @@ def List2String(liststring):
 
 # ----- Game Logic ----- #
 
-def ChooseGame(update,context,chatid,posY,posX,content):
-    context.bot.send_message(chat_id=chatid, text='Choosen Game : {}'.format(content))
+def ChooseGame(update,context,chatid,posY,posX,content,fromid):
     gameData[str(chatid)][GAMEDATA_CURRENT_GAME]=content
     StartGame(update,context,chatid,posY,posX,content)
-    return
+    return True,"Chosen Game : "+content
 
 def StartGame(update,context,chatid,posY,posX,content):
     print("Current Game is:"+gameData[str(chatid)][GAMEDATA_CURRENT_GAME])
@@ -120,10 +144,10 @@ def StartGame(update,context,chatid,posY,posX,content):
     print("Success Created Game")
     return
 
-def ReadyGame(update,context,chatid,posY,posX,content):
+def ReadyGame(update,context,chatid,posY,posX,content,fromid):
     print("Ready to Start Game")
-    game.ReadyGame(update,context,chatid,posY,posX,content)
-    return
+    exitButtonDisplay,resultText=game.ReadyGame(update,context,chatid,posY,posX,content,fromid)
+    return exitButtonDisplay,resultText
 # ----- Commands ----- #
 
 def start(update, context):
@@ -140,13 +164,19 @@ def join(update,context):
 # ----- Call back handler ----- #
 def button_callBack(update, context):
     query = update.callback_query
+    fromid=update.callback_query.from_user.id
     callBackKey,chatid,posY,posX,content=getButtonCallBackData(query)
-    query.edit_message_text(text="Selected : {}".format(content))
+    
     if(callBackKey==CALLBACKKEY_CHOOSEGAME):
-        ChooseGame(update,context,chatid,posY,posX,content)
+        exitButtonDisplay,resultText=ChooseGame(update,context,chatid,posY,posX,content,fromid)
     elif(callBackKey==CALLBACKKEY_READYSTART):
-        ReadyGame(update,context,chatid,posY,posX,content)
+        exitButtonDisplay,resultText=ReadyGame(update,context,chatid,posY,posX,content,fromid)
+    elif(callBackKey==CALLBACKKEY_DRAWCARD):
+        exitButtonDisplay,resultText=game.DrawCard(update,context,chatid,posY,posX,content,fromid)
 
+
+    if(exitButtonDisplay==True):
+        query.edit_message_text(text=resultText)
 
 # ----- Startup calls ----- #
 updater = Updater('1043079672:AAGKrVHxXkROQTZG-T9CQ0gyjGw4hzEls5s', use_context=True)
