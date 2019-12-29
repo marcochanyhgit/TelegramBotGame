@@ -52,7 +52,10 @@ class DeadManDrawGame():
         # find any thing to do after opened card #
         context.bot.send_message(chat_id=chatid,text="Opened Card"+gameData[str(chatid)]["CardsPile"][0].key)
         # TODO: Add to card deck and check icon same or not #
-        
+
+        # If explode
+        # self.CollectDeck(update, context, chatid, posY, posX, content, fromid, status)
+
         gotCard=gameData[str(chatid)]["CardsPile"].pop(0)
         gameData[str(chatid)]["CardsOutside"].append(gotCard)
         gotCard.OpenAction(update,context,chatid,posY,posX,content,gameData[str(chatid)]["JoinListName"][gameData[str(chatid)]["CurrentPlayer"]],self)
@@ -60,7 +63,13 @@ class DeadManDrawGame():
 
     def GiveUp(self,update,context,chatid,posY,posX,content,fromid):
         # TODO:Collect all card to deck #
+        self.CollectDeck(update, context, chatid, posY, posX, content, fromid, status)
+        
         self.NextPlayer(update,context,chatid,posY,posX,content,fromid)
+        return
+
+    def CollectDeck(self,update,context,chatid,posY,posX,content,fromid,status):
+        #collect starting deck to current player deck
         return
 
     def NextPlayer(self,update,context,chatid,posY,posX,content,fromid):
