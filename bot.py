@@ -162,8 +162,9 @@ def ReadyGame(update, context, chatid, posY, posX, content, fromid):
 # ----- Commands ----- #
 
 def start(update, context):
-    gameData[str(update.effective_chat.id)] = {}
-    sendButton(context, update, update.effective_chat.id, "Choose Game", CALLBACKKEY_CHOOSEGAME, [[Games.DeadManDraw]])
+    channleChatId = update.effective_chat.id
+    gameData[str(channleChatId)] = {}
+    sendButton(context, update, channleChatId, "Choose Game", CALLBACKKEY_CHOOSEGAME, [[Games.DeadManDraw]])
 
 
 def help(update, context):

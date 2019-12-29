@@ -8,6 +8,12 @@ def getButtonCallBackData(query):
 
 
 def createButtonMarkup(textList, callbackKey, chatid):
+    """
+    :param textList:    list of text which button to play
+    :param callbackKey: text of button
+    :param chatid:      channel chat id
+    :return:
+    """
     keyboard = []
     for i in range(len(textList)):
         keyboard.append([])
@@ -19,6 +25,15 @@ def createButtonMarkup(textList, callbackKey, chatid):
 
 
 def sendButton(context, update, targetChatId, queryText, callBackKey, buttonList):
+    """
+    :param context:      context of the chat
+    :param update:       object storing chat message and channel id
+    :param targetChatId: target id send to
+    :param queryText:    display text on button
+    :param callBackKey:  return text after click the button
+    :param buttonList:   button list including button text
+    :return:
+    """
     reply_markup = createButtonMarkup(buttonList,callBackKey,str(update.effective_chat.id))
     context.bot.send_message(chat_id=targetChatId,
                              text=queryText,

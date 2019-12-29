@@ -42,10 +42,12 @@ Stickers = {
 
 }
 
+
 class Card():
     def __init__(self, key):
         self.key = key
         self.skill, self.scores = self.getCardFields()
+
     def getCardFields(self):
         """
         example key : A4 means skill Anchor with score 4
@@ -53,7 +55,7 @@ class Card():
         """
         skill = Skills[self.key[0]]
         scores = int(self.key[1])
-        return skill,scores
+        return skill, scores
+
     def OpenAction(self):
         return
-
