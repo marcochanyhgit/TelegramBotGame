@@ -8,13 +8,22 @@ def hello(update, context):
         "Hello {}, from :  , chat :  , message : .".format(update.message.from_user.first_name))
     context.bot.send_message(chat_id=update.message.from_user.id, text="I'm a bot, please talk to me! {} ".format(update.message.from_user.id))
 
-def start(update, context):
-    keyboard = [[InlineKeyboardButton("Option 1", callback_data='1,'+str(update.effective_chat.id)),
-                 InlineKeyboardButton("Option 2", callback_data='2,'+str(update.effective_chat.id))],
-                [InlineKeyboardButton("Option 3", callback_data='3,'+str(update.effective_chat.id))]]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+def createButtonMarkup(textList,callbackKey,chatid):
+    keyboard=[]
+    for i in range(len(textList)):
+        keyboard.append([])
+        for i2 in range(len(textList[i])):
+            keyboard[i].append(InlineKeyboardButton(textList[i][i2],callback_data="{},{},{},{}".format(callbackKey,chatid,i,i2)))
+    return InlineKeyboardMarkup(keyboard)
 
-    context.bot.send_message(chat_id=update.message.from_user.id, text='Please choose:', reply_markup=reply_markup)
+
+
+def sendButton(context,update,targetChatId,queryText,callBackKey,buttonList):
+    reply_markup=createButtonMarkup(buttonList,callBackKey,str(update.effective_chat.id))
+    context.bot.send_message(chat_id=targetChatId, text=queryText, reply_markup=reply_markup)
+
+def start(update, context):
+    sendButton(context,update,update.message.from_user.id,"Choose Game","ChooseGame",[["Dead Man's Draw","Option 2"],["Option 3"]])
 
 
 def button(update, context):
@@ -22,7 +31,7 @@ def button(update, context):
     
     query.edit_message_text(text="Selected option: {}, chatid:{}".format(query.data,update.effective_chat.id))
     arg=query.data.split(',')
-    context.bot.send_message(chat_id=int(arg[1]), text='choosen:{}'.format(arg[0]))
+    context.bot.send_message(chat_id=int(arg[1]), text='choosen:{},{},{}'.format(arg[0],arg[2],arg[3]))
 
 
 def help(update, context):
