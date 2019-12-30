@@ -3,7 +3,7 @@ from functools import wraps
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 #   Internal Import
-from settings import gameData,game
+from settings import gameData, game
 
 
 def getButtonCallBackData(query):
@@ -38,10 +38,15 @@ def sendButton(context, update, targetChatId, queryText, callBackKey, buttonList
     :param buttonList:   button list including button text
     :return:
     """
-    reply_markup = createButtonMarkup(buttonList,callBackKey,str(update.effective_chat.id))
+    reply_markup = createButtonMarkup(buttonList, callBackKey, str(update.effective_chat.id))
     context.bot.send_message(chat_id=targetChatId,
                              text=queryText,
                              reply_markup=reply_markup)
+
+
+def sendMessage(context, update, targetChatId, queryText):
+    return context.bot.send_message(chat_id=targetChatId,
+                                    text=queryText)
 
 
 def List2String(liststring):
@@ -54,10 +59,13 @@ def List2String(liststring):
 """
 Validation
 """
+
+
 def localUserRequired(fun):
     @wraps(fun)
-    def wrapper(obj,update, context, chatid, posY, posX, content, fromid):
+    def wrapper(obj, update, context, chatid, posY, posX, content, fromid):
         if (fromid != gameData[str(chatid)]["JoinList"][gameData[str(chatid)]["CurrentPlayer"]]):
-            return False,""
-        return fun(obj,update, context, chatid, posY, posX, content, fromid)
+            return False, ""
+        return fun(obj, update, context, chatid, posY, posX, content, fromid)
+
     return wrapper

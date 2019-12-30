@@ -121,8 +121,14 @@ class DeadManDrawGame():
 
     def OpenCard(self, update, context, chatid, posY, posX, content, fromid):
         # find any thing to do after opened card #
-        context.bot.send_message(chat_id=chatid,text="Opened Card"+gameData[str(chatid)]["CardsPile"][0].key)
+
         gotCard=gameData[str(chatid)]["CardsPile"].pop(0)
+        self.displayCard(update,context,chatid,
+                         queryText="Previous Card: ",
+                         cardList=gameData[str(chatid)]["CardsOutside"])
+        self.displayCard(update,context,chatid,
+                         queryText="Opened Card: ",
+                         cardList=[gotCard])
         if(self.CheckCardOutsideExist(gameData[str(chatid)]["CardsOutside"],gotCard)):
             context.bot.send_message(chat_id=chatid,text="Busted!")
             self.CollectDeck(update, context, chatid, posY, posX, content, fromid, "Bust",gotCard)
@@ -239,20 +245,34 @@ class DeadManDrawGame():
                 card=gameData[str(chatid)]["CardsOutside"].pop(0)
                 gameData[str(chatid)]["GravePile"].append(card)
 
-    def displayCard(self,update,context, targetChatId, queryText, callBackKey, cardList,isUniqueTop=False):
+    @staticmethod
+    def displayCard(update,context, targetChatId, queryText, cardList, callBackKey=None,isUniqueTop=False):
         """
         :param isUniqueTop: True for showing the top of the cards [A5,A4,A7,B4,B5] -> [A7,B5]
         :return:
         """
         if isUniqueTop:
             playCardDeck = PlayerCardDeck(cardList)
-            displayCardList = playCardDeck.topCardList
-        else:
-            displayCardList = cardList
+            displayCardList = [playCardDeck.topCardEmojiList]
 
-        tools.sendButton(context=context,
+            tools.sendButton(context=context,
                              update=update,
                              targetChatId=targetChatId,
                              queryText=queryText,
                              callBackKey=callBackKey,
-                            buttonList=displayCardList)
+                             buttonList=displayCardList)
+        else:
+            """
+            display player playing card
+            query text = Opened Card    cardList = [<Card_A4>,<Card_A5>,...] 
+            =>
+            Opened Card: Emoji , Emoji , Emoji
+            """
+
+            cardKeyList = PlayerCardDeck(cardList).getCardEmojiList()
+            queryText += ""+" , ".join(cardKeyList)
+
+            tools.sendMessage(context=context,
+                              update=update,
+                              targetChatId=targetChatId,
+                              queryText=queryText)
