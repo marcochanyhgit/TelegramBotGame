@@ -38,8 +38,26 @@ Skills = {
     "J": "Sword"
 }
 
-Stickers = {
-
+Emoji = {
+    "Anchor":'⚓',
+    "Cannon":'💣',
+    "Chest":'💰',
+    "Hook":'✔',
+    "Key":'🔑',
+    "Kraken":'🐙',
+    "Map":'📜',
+    "Mermaid":'🐟',
+     "Oracle":'🔮',
+    "Sword":'🗡',
+    1:"1⃣",        
+    2:"2⃣",
+    3:"3⃣",
+    4:"4⃣",
+    5:"5⃣",
+    6:"6⃣",
+    7:"7⃣",
+    8:"8⃣",
+    9:"9⃣"
 }
 
 
@@ -47,9 +65,13 @@ class Card():
     def __init__(self, key):
         self.key = key
         self.skill, self.scores = self.getCardFields()
-    
+        self.emoji = self.display()
+
     def __str__(self):
         return "Card_"+str(self.key)
+
+    def display(self):
+        return Emoji[self.skill]+Emoji[self.scores]
 
     def getCardFields(self):
         """
