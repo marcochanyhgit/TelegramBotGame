@@ -1,5 +1,9 @@
 #   External Import
+from functools import wraps
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+
+#   Internal Import
+from settings import gameData,game
 
 
 def getButtonCallBackData(query):
@@ -45,3 +49,15 @@ def List2String(liststring):
     for i in liststring:
         s = s + str(i) + "\n"
     return s
+
+
+"""
+Validation
+"""
+def localUserRequired(fun):
+    @wraps(fun)
+    def wrapper(obj,update, context, chatid, posY, posX, content, fromid):
+        if (fromid != gameData[str(chatid)]["JoinList"][gameData[str(chatid)]["CurrentPlayer"]]):
+            return False,""
+        return fun(obj,update, context, chatid, posY, posX, content, fromid)
+    return wrapper

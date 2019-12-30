@@ -2,6 +2,7 @@
 from Card import Card
 from settings import game, gameData, CALLBACKKEY_READYSTART, CALLBACKKEY_DRAWCARD
 import tools
+from PlayerCardDeck import PlayerCardDeck
 #   Built-in function
 import random
 
@@ -190,16 +191,17 @@ class DeadManDrawGame():
         self.OpenCard(update, context, chatid, posY, posX, content)
         return
 
+    @tools.localUserRequired
     def DrawCard(self, update, context, chatid, posY, posX, content, fromid):
-        if(fromid==gameData[str(chatid)]["JoinList"][gameData[str(chatid)]["CurrentPlayer"]]):
-            if(content=="Draw Card"):
-                self.OpenCard(update,context,chatid,posY,posX,content,fromid)
-                return True,"Drawed card"
-            elif(content=="Give Up"):
-                self.GiveUp(update,context,chatid,posY,posX,content,fromid)
-                return True,"Give Up Draw Card"
-        else:
-            return False,"" 
+        # if(fromid==gameData[str(chatid)]["JoinList"][gameData[str(chatid)]["CurrentPlayer"]]):
+        if(content=="Draw Card"):
+            self.OpenCard(update,context,chatid,posY,posX,content,fromid)
+            return True,"Drawed card"
+        elif(content=="Give Up"):
+            self.GiveUp(update,context,chatid,posY,posX,content,fromid)
+            return True,"Give Up Draw Card"
+        # else:
+        #     return False,""
 
     def CheckCardOutsideExist(self,cardList,card):
         for i in cardList:
@@ -236,3 +238,21 @@ class DeadManDrawGame():
             while(len(gameData[str(chatid)]["CardsOutside"])>0):
                 card=gameData[str(chatid)]["CardsOutside"].pop(0)
                 gameData[str(chatid)]["GravePile"].append(card)
+
+    def displayCard(self,update,context, targetChatId, queryText, callBackKey, cardList,isUniqueTop=False):
+        """
+        :param isUniqueTop: True for showing the top of the cards [A5,A4,A7,B4,B5] -> [A7,B5]
+        :return:
+        """
+        if isUniqueTop:
+            playCardDeck = PlayerCardDeck(cardList)
+            displayCardList = playCardDeck.topCardList
+        else:
+            displayCardList = cardList
+
+        tools.sendButton(context=context,
+                             update=update,
+                             targetChatId=targetChatId,
+                             queryText=queryText,
+                             callBackKey=callBackKey,
+                            buttonList=displayCardList)
