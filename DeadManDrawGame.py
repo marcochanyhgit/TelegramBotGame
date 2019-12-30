@@ -15,6 +15,7 @@ class DeadManDrawGame():
         gameData[str(chatid)]["CardsPile"]=[]
         gameData[str(chatid)]["CardsOutside"]=[]
         gameData[str(chatid)]["GravePile"]=[]
+        gameData[str(chatid)]["PlayerCards"]=[]
         context.bot.send_message(chat_id=chatid, text="(press /join to join game)")
         return
 
@@ -50,47 +51,47 @@ class DeadManDrawGame():
         deck.append(Card("D6"))
         deck.append(Card("D7"))
         
-        deck.append(Card("E2"))
-        deck.append(Card("E3"))
-        deck.append(Card("E4"))
-        deck.append(Card("E5"))
-        deck.append(Card("E6"))
-        deck.append(Card("E7"))
+        # deck.append(Card("E2"))
+        # deck.append(Card("E3"))
+        # deck.append(Card("E4"))
+        # deck.append(Card("E5"))
+        # deck.append(Card("E6"))
+        # deck.append(Card("E7"))
         
-        deck.append(Card("F2"))
-        deck.append(Card("F3"))
-        deck.append(Card("F4"))
-        deck.append(Card("F5"))
-        deck.append(Card("F6"))
-        deck.append(Card("F7"))
+        # deck.append(Card("F2"))
+        # deck.append(Card("F3"))
+        # deck.append(Card("F4"))
+        # deck.append(Card("F5"))
+        # deck.append(Card("F6"))
+        # deck.append(Card("F7"))
         
-        deck.append(Card("G2"))
-        deck.append(Card("G3"))
-        deck.append(Card("G4"))
-        deck.append(Card("G5"))
-        deck.append(Card("G6"))
-        deck.append(Card("G7"))
+        # deck.append(Card("G2"))
+        # deck.append(Card("G3"))
+        # deck.append(Card("G4"))
+        # deck.append(Card("G5"))
+        # deck.append(Card("G6"))
+        # deck.append(Card("G7"))
         
-        deck.append(Card("H4"))
-        deck.append(Card("H5"))
-        deck.append(Card("H6"))
-        deck.append(Card("H7"))
-        deck.append(Card("H8"))
-        deck.append(Card("H9"))
+        # deck.append(Card("H4"))
+        # deck.append(Card("H5"))
+        # deck.append(Card("H6"))
+        # deck.append(Card("H7"))
+        # deck.append(Card("H8"))
+        # deck.append(Card("H9"))
         
-        deck.append(Card("I2"))
-        deck.append(Card("I3"))
-        deck.append(Card("I4"))
-        deck.append(Card("I5"))
-        deck.append(Card("I6"))
-        deck.append(Card("I7"))
+        # deck.append(Card("I2"))
+        # deck.append(Card("I3"))
+        # deck.append(Card("I4"))
+        # deck.append(Card("I5"))
+        # deck.append(Card("I6"))
+        # deck.append(Card("I7"))
         
-        deck.append(Card("J2"))
-        deck.append(Card("J3"))
-        deck.append(Card("J4"))
-        deck.append(Card("J5"))
-        deck.append(Card("J6"))
-        deck.append(Card("J7"))
+        # deck.append(Card("J2"))
+        # deck.append(Card("J3"))
+        # deck.append(Card("J4"))
+        # deck.append(Card("J5"))
+        # deck.append(Card("J6"))
+        # deck.append(Card("J7"))
 
         random.shuffle(deck)
         return deck
@@ -101,6 +102,7 @@ class DeadManDrawGame():
         gameData[str(chatid)]["CardsPile"] = self.GenerateCards()
         context.bot.send_message(chat_id=chatid,text="Picked player {} as first player".format(
             gameData[str(chatid)]["JoinListName"][gameData[str(chatid)]["CurrentPlayer"]]))
+        gameData[str(chatid)]["PlayerCards"]=[[] for i in range(len(gameData[str(chatid)]["JoinListName"]))]
         return
 
     def StartTurn(self, update, context, chatid, posY, posX, content):
@@ -122,7 +124,7 @@ class DeadManDrawGame():
         gotCard=gameData[str(chatid)]["CardsPile"].pop(0)
         if(self.CheckCardOutsideExist(gameData[str(chatid)]["CardsOutside"],gotCard)):
             context.bot.send_message(chat_id=chatid,text="Busted!")
-            self.CollectDeck(update, context, chatid, posY, posX, content, fromid, "Bust")
+            self.CollectDeck(update, context, chatid, posY, posX, content, fromid, "Bust",gotCard)
             self.NextPlayer(update,context,chatid,posY,posX,content,fromid)
         else:
             gameData[str(chatid)]["CardsOutside"].append(gotCard)
@@ -132,14 +134,21 @@ class DeadManDrawGame():
     def GiveUp(self,update,context,chatid,posY,posX,content,fromid):
         # TODO:Collect all card to deck #
         context.bot.send_message(chat_id=chatid,text="GiveUp!")
-        self.CollectDeck(update, context, chatid, posY, posX, content, fromid, "GiveUp")
+        self.CollectDeck(update, context, chatid, posY, posX, content, fromid, "GiveUp",None)
         self.NextPlayer(update,context,chatid,posY,posX,content,fromid)
         return
 
-    def CollectDeck(self,update,context,chatid,posY,posX,content,fromid,status):
+    def CollectDeck(self,update,context,chatid,posY,posX,content,fromid,status,gotCard):
         #collect starting deck to current player deck
         #other card throw to grave yard
+        if(status=="Bust"):
+            self.CollectBustDeck(chatid,gameData[str(chatid)]["CurrentPlayer"],gotCard)
+        elif(status=="GiveUp"):
+            self.CollectAllDeckToPlayer(chatid,gameData[str(chatid)]["CurrentPlayer"])
+        print("Player:",gameData[str(chatid)]["PlayerCards"][gameData[str(chatid)]["CurrentPlayer"]])
+        print("Grave:",gameData[str(chatid)]["GravePile"])
         return
+    
 
     def NextPlayer(self,update,context,chatid,posY,posX,content,fromid):
         # Call next player to next turn
@@ -197,3 +206,33 @@ class DeadManDrawGame():
             if(i.skill==card.skill):
                 return True
         return False
+
+    def CollectAllDeckToPlayer(self,chatid,playerId):
+        while(len(gameData[str(chatid)]["CardsOutside"])>0):
+            
+            gameData[str(chatid)]["PlayerCards"][playerId].append(gameData[str(chatid)]["CardsOutside"].pop(0))
+    
+    def CollectBustDeck(self,chatid,playerId,gotCard):
+        hasAnchor=False
+        for i in gameData[str(chatid)]["CardsOutside"]:
+            if(i.skill=="Anchor"):
+                hasAnchor=True
+
+        if(hasAnchor):
+            gameData[str(chatid)]["GravePile"].append(gotCard)
+            anchorMeet=False
+            while(len(gameData[str(chatid)]["CardsOutside"])>0):
+                card=gameData[str(chatid)]["CardsOutside"].pop(len(gameData[str(chatid)]["CardsOutside"])-1)
+                if(anchorMeet==False):
+                    gameData[str(chatid)]["GravePile"].append(card)
+                else:
+                    gameData[str(chatid)]["PlayerCards"][playerId].append(card)
+
+                if(card.skill=="Anchor"):
+                    anchorMeet=True
+                
+        else:
+            gameData[str(chatid)]["GravePile"].append(gotCard)
+            while(len(gameData[str(chatid)]["CardsOutside"])>0):
+                card=gameData[str(chatid)]["CardsOutside"].pop(0)
+                gameData[str(chatid)]["GravePile"].append(card)

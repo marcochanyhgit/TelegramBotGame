@@ -47,6 +47,9 @@ class Card():
     def __init__(self, key):
         self.key = key
         self.skill, self.scores = self.getCardFields()
+    
+    def __str__(self):
+        return "Card_"+str(self.key)
 
     def getCardFields(self):
         """
