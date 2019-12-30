@@ -1,5 +1,6 @@
 #   Internal Import
-from Card import Card
+from Cards.Card_Anchor import Card_Anchor
+from Cards.Card import Card
 from settings import game, gameData, CALLBACKKEY_READYSTART, CALLBACKKEY_DRAWCARD
 import tools
 from PlayerCardDeck import PlayerCardDeck
@@ -24,12 +25,12 @@ class DeadManDrawGame():
     def GenerateCards(self):
         deck = []
 
-        deck.append(Card("A2"))
-        deck.append(Card("A3"))
-        deck.append(Card("A4"))
-        deck.append(Card("A5"))
-        deck.append(Card("A6"))
-        deck.append(Card("A7"))
+        deck.append(Card_Anchor("A2"))
+        deck.append(Card_Anchor("A3"))
+        deck.append(Card_Anchor("A4"))
+        deck.append(Card_Anchor("A5"))
+        deck.append(Card_Anchor("A6"))
+        deck.append(Card_Anchor("A7"))
 
         deck.append(Card("B2"))
         deck.append(Card("B3"))
