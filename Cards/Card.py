@@ -26,6 +26,18 @@
 """
 
 
+class Skill:
+    Anchor = "Anchor",
+    Cannon = "Cannon",
+    Chest =  "Chest",
+    Hook = "Hook",
+    Key = "Key",
+    Kraken = "Karaken",
+    Map  = "Map",
+    Mermain = "Mermain",
+    Oracle = "Oracle",
+    Sword = "Sword"
+
 Skills = {
     "A": "Anchor",
     "B": "Cannon",
@@ -34,7 +46,7 @@ Skills = {
     "E": "Key",
     "F": "Kraken",
     "G": "Map",
-    "H": "Mermaid",
+    "H": "Mermain",
     "I": "Oracle",
     "J": "Sword"
 }
@@ -47,8 +59,8 @@ Emoji = {
     "Key":'🔑',
     "Kraken":'🐙',
     "Map":'📜',
-    "Mermaid":'🐟',
-     "Oracle":'🔮',
+    "Mermain":'🐟',
+    "Oracle":'🔮',
     "Sword":'🗡',
     1:"1⃣",        
     2:"2⃣",
@@ -67,9 +79,9 @@ class Card():
         self.key = key
         self.skill, self.scores = self.getCardFields()
         self.emoji = self.display()
-
-    def __str__(self):
-        return "Card_"+str(self.key)
+    #
+    # def __str__(self):
+    #     return "Card_"+str(self.key)
 
     def display(self):
         return Emoji[self.skill]+Emoji[self.scores]

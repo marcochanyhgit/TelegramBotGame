@@ -14,6 +14,7 @@ class GeneralCardDeck:
         """
         :return: list of card object
         """
+        print("cardlist:"+str(self.cardList))
         sortedCardList = sorted(self.cardList, key=lambda x: x.key, reverse=True)
 
         prevCardSkill = None
@@ -28,7 +29,13 @@ class GeneralCardDeck:
     def getTopCardEmojiList(self):
         return [card.emoji for card in self.topCardList]
 
-
+    def remove(self,targetCardKey):
+        for i in range(len(self.cardList)):
+            card = self.cardList[i]
+            if card.key == targetCardKey:
+                self.cardList.pop(i)
+                print(card.key+"removed")
+                break
 
 class PlayerCardDeck(GeneralCardDeck):
     def __init__(self, cardList):
@@ -37,3 +44,4 @@ class PlayerCardDeck(GeneralCardDeck):
 
     def getTotalScores(self):
         return sum([card.scores for card in self.topCardList])
+

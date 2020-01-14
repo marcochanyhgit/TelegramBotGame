@@ -4,10 +4,18 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 import logging
 import random
+
+from Cards.Card_Cannon import Card_Cannon
+from Cards.Card_Hook import Card_Hook
+from Cards.Card_Map import Card_Map
+from Cards.Card_Oracle import Card_Oracle
+from Cards.Card_Sword import Card_Sword
+from PlayerCardDeck import PlayerCardDeck, GeneralCardDeck
 from settings import game, gameData, CALLBACKKEY_READYSTART, CALLBACKKEY_DRAWCARD, GAMEDATA_CURRENT_GAME, \
-    CALLBACKKEY_CHOOSEGAME
-from DeadManDrawGame import DeadManDrawGame
+    CALLBACKKEY_CHOOSEGAME, CALLBACKKEY_SKILL, CardListType
+from DeadManDrawGame import DeadManDrawGame, SkillManager
 from Game import Games
+from Cards.Card import Card, Skill, Skills
 
 # ----- Game Logic ----- #
 from tools import getButtonCallBackData, sendButton
@@ -54,7 +62,8 @@ def button_callBack(update, context):
     query = update.callback_query
     fromid = update.callback_query.from_user.id
     callBackKey, chatid, posY, posX, content = getButtonCallBackData(query)
-    print(getButtonCallBackData(query))
+    print(callBackKey, content)
+    exitButtonDisplay, continueTurn = False,False
     if (callBackKey == CALLBACKKEY_CHOOSEGAME):
         exitButtonDisplay, resultText = ChooseGame(update, context, chatid, posY, posX, content, fromid)
     elif (callBackKey == CALLBACKKEY_READYSTART):
@@ -62,8 +71,42 @@ def button_callBack(update, context):
     elif (callBackKey == CALLBACKKEY_DRAWCARD):
         exitButtonDisplay, resultText = game.DrawCard(update, context, chatid, posY, posX, content, fromid)
 
+    elif callBackKey in Skills.values():
+        #   content is the selected Card key
+        selectedCardKey = content
+        selectedPlayerId = posY
+        exitButtonDisplay, resultText = SkillManager.DoAction(callBackKey,chatid,selectedPlayerId,selectedCardKey)
+        continueTurn = True
+        # from Cards.Card_Cannon import Card_Cannon
+        # from Cards.Card import Card, Skill
+        # targetPlayerCardDeck = PlayerCardDeck(gameData[str(chatid)]["PlayerCards"][selectedPlayerId])
+        # currentPlayerCardDeck = PlayerCardDeck(CardListType.getCardList(CardListType.OWN_PLAYER, chatid))
+        # graveDeck = CardListType.getCardList(CardListType.GRAVE, chatid)
+        # if callBackKey == Skill.Cannon:
+        #     # put player's card to grave
+        #     targetPlayerCardDeck.remove(selectedCardKey)
+        #
+        #     card = Card_Cannon(selectedCardKey)
+        #     graveDeck.append(card)
+        #
+        #     exitButtonDisplay, resultText = True, "You Use Skill:"+content
+        # elif callBackKey == Skill.Hook:
+        #     currentPlayerCardDeck.remove(selectedCardKey)
+        #     # play selected card
+        # elif callBackKey == Skill.Map:
+        #     graveCardDeck = GeneralCardDeck(graveDeck)
+        #     graveCardDeck.remove(selectedCardKey)
+        #
+        #     # play selected card
+        # elif callBackKey == Skill.Sword:
+        #     targetPlayerCardDeck.remove(selectedCardKey)
+        # elif callBackKey == Skill.Oracle:
+        #     pass
     if (exitButtonDisplay == True):
         query.edit_message_text(text=resultText)
+    if continueTurn == True:
+        game.ContinueTurn(update, context, chatid, posY, posX, content)
+
 
 
 # ----- Set Logging ----- #
