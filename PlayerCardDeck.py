@@ -33,9 +33,9 @@ class GeneralCardDeck:
         for i in range(len(self.cardList)):
             card = self.cardList[i]
             if card.key == targetCardKey:
-                self.cardList.pop(i)
+                popCard = self.cardList.pop(i)
                 print(card.key+"removed")
-                break
+                return popCard
 
 class PlayerCardDeck(GeneralCardDeck):
     def __init__(self, cardList):

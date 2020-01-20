@@ -61,6 +61,9 @@ def displayButtonCard(update, context, chatid, queryText, callBackKey, cardListT
         Display multiple decks of cards
         [cards],[cards],[cards] => [player][cards],[player][cards],[player][cards]
         """
+        for card in cardList:
+            playCardDeck = PlayerCardDeck(card)
+            displayCardList.append(playCardDeck.topCardList)
     elif cardListType == CardListType.OWN_PLAYER or cardListType == CardListType.GRAVE:
         """
         Display single deck of cards
@@ -93,14 +96,15 @@ def createEmojiButtonMarkup(playerIdList, buttonList, callbackKey, chatid):
     5.  content:free to edit
     """
     keyboard = []
-    for i in range(len(buttonList)):
+    for i in range(len(playerIdList)):
+
         playName = gameData[str(chatid)]["JoinListName"][i]
         keyboard.append([InlineKeyboardButton(playName,
                                               callback_data="{},{},{},{},{}".format("Invalid", chatid, i, 0,
                                                                                     "Invalid"))])
         keyboard.append([])
         for i2 in range(len(buttonList[i])):
-            keyboard[i + 1].append(InlineKeyboardButton(buttonList[i][i2].emoji,
+            keyboard[i*2 + 1].append(InlineKeyboardButton(buttonList[i][i2].emoji,
                                                         callback_data="{},{},{},{},{}".format(callbackKey, chatid, playerIdList[i],
                                                                                               i2,
                                                                                               buttonList[i][i2].key)))

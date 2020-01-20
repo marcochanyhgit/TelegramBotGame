@@ -1,4 +1,5 @@
 #   Internal Import
+from Cards.CardManager import CardManager
 from Cards.Card_Anchor import Card_Anchor
 from Cards.Card import Card
 from Cards.Card_Cannon import Card_Cannon
@@ -138,7 +139,7 @@ class DeadManDrawGame():
                          queryText="Opened Card: ",
                          cardList=[gotCard])
 
-        if (self.CheckCardOutsideExist(gameData[str(chatid)]["CardsOutside"], gotCard)):
+        if self.CheckCardOutsideExist(gameData[str(chatid)]["CardsOutside"], gotCard):
             context.bot.send_message(chat_id=chatid, text="Busted!")
             self.CollectDeck(update, context, chatid, posY, posX, content, fromid, "Bust", gotCard)
             self.NextPlayer(update, context, chatid, posY, posX, content, fromid)
@@ -294,20 +295,19 @@ class SkillManager:
     def DoAction( callBackKey,chatid,selectedPlayerId,selectedCardKey):
         from Cards.Card_Cannon import Card_Cannon
         from Cards.Card import Card, Skill
-        targetPlayerCardDeck = PlayerCardDeck(gameData[str(chatid)]["PlayerCards"][gameData[str(chatid)]["CurrentPlayer"]])
+        print(gameData[str(chatid)]["PlayerCards"])
+        targetPlayerCardDeck = PlayerCardDeck(gameData[str(chatid)]["PlayerCards"][selectedPlayerId])
         _,currentPlayerDeck = CardListType.getCardList(CardListType.OWN_PLAYER,chatid)
         currentPlayerCardDeck = PlayerCardDeck(currentPlayerDeck)
         graveDeck = CardListType.getCardList(CardListType.GRAVE, chatid)
 
         if callBackKey == "Cannon":
             #put player's card to grave
-            targetPlayerCardDeck.remove(selectedCardKey)
-
-            card = Card_Cannon(selectedCardKey)
-            graveDeck.append(card)
+            grabCard = targetPlayerCardDeck.remove(selectedCardKey)
+            graveDeck.append(grabCard)
             print(graveDeck)
             print(targetPlayerCardDeck)
-            resultMessage = card.resultQuery(gameData[str(chatid)]["JoinListName"][0])
+            resultMessage = "You destroyed player {} {}.".format(gameData[str(chatid)]["JoinListName"][0],selectedCardKey)
             return True , resultMessage
         elif callBackKey == "Hook":
             currentPlayerCardDeck.remove(selectedCardKey)

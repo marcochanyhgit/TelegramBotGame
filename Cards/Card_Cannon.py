@@ -11,8 +11,6 @@ class Card_Cannon(Card):
     def getQueryText():
         return "Choose to Destroy One Player's Card "
 
-    def resultQuery(self,playerName):
-        return "You destroyed player {} {}.".format(playerName,self.emoji)
 
     def OpenAction(self,update,context,chatid,posY,posX,content,playerName,game):
         context.bot.send_message(chat_id=chatid,text="{} has opened {}".format(playerName,self.key))
@@ -20,7 +18,7 @@ class Card_Cannon(Card):
             tools.displayButtonCard(update,context,chatid,
                              queryText=self.getQueryText(),
                              callBackKey=self.skill,
-                             cardListType=CardListType.OWN_PLAYER)
+                             cardListType=CardListType.OTHERS_PLAYER)
         else:
             game.ContinueTurn(update, context, chatid, posY, posX, content)
 

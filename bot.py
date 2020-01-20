@@ -1,6 +1,5 @@
 import os
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 import logging
 import random
@@ -48,6 +47,20 @@ def start(update, context):
     gameData[str(channleChatId)] = {}
     sendButton(context, update, channleChatId, "Choose Game", CALLBACKKEY_CHOOSEGAME, [[Games.DeadManDraw]])
 
+def show(update,context):
+    channleChatId = update.effective_chat.id
+    gravecard = CardListType.getCardList(CardListType.GRAVE, channleChatId)
+    allcard = CardListType.getCardList(CardListType.All,channleChatId)
+    gc = PlayerCardDeck(gravecard)
+    ac = []
+    for card in allcard:
+        pc = PlayerCardDeck(card)
+        ac.append(pc.getCardEmojiList())
+    update.message.reply_text("Grave: "+str(gc.getCardEmojiList())+"\n"+
+                              "Players: "+str(ac)+"\n"+
+                              gameData[str(channleChatId)]["JoinListName"])
+
+
 
 def help(update, context):
     update.message.reply_text("Use /start to test this bot.")
@@ -62,7 +75,6 @@ def button_callBack(update, context):
     query = update.callback_query
     fromid = update.callback_query.from_user.id
     callBackKey, chatid, posY, posX, content = getButtonCallBackData(query)
-    print(callBackKey, content)
     exitButtonDisplay, continueTurn = False,False
     if (callBackKey == CALLBACKKEY_CHOOSEGAME):
         exitButtonDisplay, resultText = ChooseGame(update, context, chatid, posY, posX, content, fromid)
@@ -122,6 +134,7 @@ updater.dispatcher.add_handler(CommandHandler('start', start))
 updater.dispatcher.add_handler(CallbackQueryHandler(button_callBack))
 updater.dispatcher.add_handler(CommandHandler('help', help))
 updater.dispatcher.add_handler(CommandHandler('join', join))
+updater.dispatcher.add_handler(CommandHandler('show', show))
 
 
 updater.start_polling()
