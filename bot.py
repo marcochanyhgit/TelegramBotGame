@@ -58,7 +58,7 @@ def show(update,context):
         ac.append(pc.getCardEmojiList())
     update.message.reply_text("Grave: "+str(gc.getCardEmojiList())+"\n"+
                               "Players: "+str(ac)+"\n"+
-                              gameData[str(channleChatId)]["JoinListName"])
+                              ','.join(map(str,gameData[str(channleChatId)]["JoinListName"])))
 
 
 
