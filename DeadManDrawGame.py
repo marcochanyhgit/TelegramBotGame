@@ -219,6 +219,11 @@ class DeadManDrawGame():
         # Start a game
         return
 
+    def EndGame(self, update, context):
+        print("Game Ended, Counting score now")
+        #TODO: Count score
+        return
+
     def showJoinList(self, update, context, chat_id):
         listString = tools.List2String(gameData[str(update.effective_chat.id)]["JoinListName"])
         # context.bot.send_message(chat_id=chat_id,text="Join List: (press /join to join game)\n"+listString)
@@ -251,9 +256,13 @@ class DeadManDrawGame():
     def DrawCard(self, update, context, chatid, posY, posX, content, fromid):
         # if(fromid==gameData[str(chatid)]["JoinList"][gameData[str(chatid)]["CurrentPlayer"]]):
         if (content == "Draw Card"):
-            gotCard = gameData[str(chatid)]["CardsPile"].pop(0)
-            self.OpenCard(update, context, chatid, posY, posX, content, fromid,gotCard)
-            return True, "Drawed card"
+            if len(gameData[str(chatid)]["CardsPile"])>0:
+                gotCard = gameData[str(chatid)]["CardsPile"].pop(0)
+                self.OpenCard(update, context, chatid, posY, posX, content, fromid,gotCard)
+                return True, "Drawed card"
+            else:
+                self.EndGame(update, context)
+                return True, "End Game"
         elif (content == "Give Up"):
             self.GiveUp(update, context, chatid, posY, posX, content, fromid)
             return True, "Give Up Draw Card"

@@ -76,6 +76,7 @@ def button_callBack(update, context):
     fromid = update.callback_query.from_user.id
     callBackKey, chatid, posY, posX, content = getButtonCallBackData(query)
     exitButtonDisplay, continueTurn = False,False
+    
     if (callBackKey == CALLBACKKEY_CHOOSEGAME):
         exitButtonDisplay, resultText = ChooseGame(update, context, chatid, posY, posX, content, fromid)
     elif (callBackKey == CALLBACKKEY_READYSTART):
@@ -115,8 +116,12 @@ def button_callBack(update, context):
         #     targetPlayerCardDeck.remove(selectedCardKey)
         # elif callBackKey == Skill.Oracle:
         #     pass
+
     if (exitButtonDisplay == True):
-        query.edit_message_text(text=resultText)
+        query.edit_message_text(text="Selected")
+
+        context.bot.send_message(chat_id=chatid, text=resultText)
+        # query.edit_message_text(text=resultText)
     if continueTurn == True:
         game.ContinueTurn(update, context, chatid, posY, posX, content)
 
