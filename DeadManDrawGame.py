@@ -1,12 +1,16 @@
 #   Internal Import
 from Cards.CardManager import CardManager
-from Cards.Card_Anchor import Card_Anchor
 from Cards.Card import Card
+from Cards.Card_Anchor import Card_Anchor
 from Cards.Card_Cannon import Card_Cannon
 from Cards.Card_Hook import Card_Hook
 from Cards.Card_Map import Card_Map
 from Cards.Card_Oracle import Card_Oracle
 from Cards.Card_Sword import Card_Sword
+from Cards.Card_Chest import Card_Chest
+from Cards.Card_Mermain import Card_Mermain
+from Cards.Card_Kraken import Card_Kraken
+from Cards.Card_Key import Card_Key
 from settings import game, gameData, CALLBACKKEY_READYSTART, CALLBACKKEY_DRAWCARD, CardListType
 import tools
 from PlayerCardDeck import PlayerCardDeck, GeneralCardDeck
@@ -162,6 +166,9 @@ class DeadManDrawGame():
         if (status == "Bust"):
             self.CollectBustDeck(chatid, gameData[str(chatid)]["CurrentPlayer"], gotCard)
         elif (status == "GiveUp"):
+            if CheckContainKeyChestPair(gameData[str(chatid)]["CardsOutside"]):
+                # Has key chest pair, draw 3 card from grave pile
+                gameData[str(chatid)]["CardsOutside"].append(GetRandomCards(3,gameData[str(chatid)]["GravePile"]))
             self.CollectAllDeckToPlayer(chatid, gameData[str(chatid)]["CurrentPlayer"])
         print("Player:", gameData[str(chatid)]["PlayerCards"][gameData[str(chatid)]["CurrentPlayer"]])
         print("Grave:", gameData[str(chatid)]["GravePile"])
@@ -256,6 +263,26 @@ class DeadManDrawGame():
                 card = gameData[str(chatid)]["CardsOutside"].pop(0)
                 gameData[str(chatid)]["GravePile"].append(card)
 
+    def GetRandomCards(self, count,cardList):
+        #return a list of cards if exist
+        resultList=[]
+        for i in range(count):
+            if len(cardList)<=0:
+                return resultList
+            ran=random.randint(0,len(cardList)-1)
+            resultList.append(cardList.pop(count))
+        return resultList
+
+    def CheckContainKeyChestPair(self, cardList):
+        #return contain key chest or not
+        hasKey=False
+        hasChest=False
+        for i,x in enumerate(cardList):
+            if x.skill=="E":
+                hasKey=True
+            if x.skill=="C":
+                hasChest=True
+        return (hasKey and hasChest)
 
     @staticmethod
     def displayCard(update, context, targetChatId, queryText, cardList, callBackKey=None, isUniqueTop=False):
