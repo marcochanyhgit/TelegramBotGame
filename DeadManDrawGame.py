@@ -3,8 +3,12 @@ from Cards.CardManager import CardManager
 from Cards.Card_Anchor import Card_Anchor
 from Cards.Card import Card
 from Cards.Card_Cannon import Card_Cannon
+from Cards.Card_Chest import Card_Chest
 from Cards.Card_Hook import Card_Hook
+from Cards.Card_Key import Card_Key
+from Cards.Card_Kraken import Card_Kraken
 from Cards.Card_Map import Card_Map
+from Cards.Card_Mermain import Card_Mermain
 from Cards.Card_Oracle import Card_Oracle
 from Cards.Card_Sword import Card_Sword
 from settings import game, gameData, CALLBACKKEY_READYSTART, CALLBACKKEY_DRAWCARD, CardListType
@@ -292,7 +296,7 @@ class DeadManDrawGame():
 
 class SkillManager:
     @staticmethod
-    def DoAction( callBackKey,chatid,selectedPlayerId,selectedCardKey):
+    def DoAction( update,context,chatid,posY,posX,fromid,callBackKey,selectedPlayerId,selectedCardKey):
         from Cards.Card_Cannon import Card_Cannon
         from Cards.Card import Card, Skill
         print(gameData[str(chatid)]["PlayerCards"])
@@ -310,7 +314,11 @@ class SkillManager:
             resultMessage = "You destroyed player {} {}.".format(gameData[str(chatid)]["JoinListName"][0],selectedCardKey)
             return True , resultMessage
         elif callBackKey == "Hook":
-            currentPlayerCardDeck.remove(selectedCardKey)
+            grabCard = currentPlayerCardDeck.remove(selectedCardKey)
+            DeadManDrawGame.OpenCard(update,context,chatid,posY,posX,
+                                     content=callBackKey,
+                                     fromid=fromid,
+                                     gotCard=grabCard)
             #play selected card
         elif callBackKey == "Map":
             graveCardDeck = GeneralCardDeck(graveDeck)
