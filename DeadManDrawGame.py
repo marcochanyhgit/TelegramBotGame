@@ -1,7 +1,7 @@
 #   Internal Import
 from Cards.CardManager import CardManager
-from Cards.Card_Anchor import Card_Anchor
 from Cards.Card import Card
+from Cards.Card_Anchor import Card_Anchor
 from Cards.Card_Cannon import Card_Cannon
 from Cards.Card_Chest import Card_Chest
 from Cards.Card_Hook import Card_Hook
@@ -11,7 +11,11 @@ from Cards.Card_Map import Card_Map
 from Cards.Card_Mermain import Card_Mermain
 from Cards.Card_Oracle import Card_Oracle
 from Cards.Card_Sword import Card_Sword
-from settings import game, gameData, CALLBACKKEY_READYSTART, CALLBACKKEY_DRAWCARD, CardListType, mapCount
+from Cards.Card_Chest import Card_Chest
+from Cards.Card_Mermain import Card_Mermain
+from Cards.Card_Kraken import Card_Kraken
+from Cards.Card_Key import Card_Key
+from settings import game, gameData, CALLBACKKEY_READYSTART, CALLBACKKEY_DRAWCARD, CardListType,mapCount
 import tools
 from PlayerCardDeck import PlayerCardDeck, GeneralCardDeck
 #   Built-in function
@@ -21,6 +25,7 @@ import random
 class DeadManDrawGame():
     def __init__(self, chatid, update, context):
         # Initialize card info
+        self.isKrakenOpened=0
         gameData[str(chatid)]["JoinList"] = []
         gameData[str(chatid)]["JoinListName"] = []
         gameData[str(chatid)]["StartingGame"] = False
@@ -33,73 +38,89 @@ class DeadManDrawGame():
         return
 
     # ----- Game Logic ----- #
-    def GenerateCards(self):
+    def GenerateGravePileCards(self):
         deck = []
 
         deck.append(Card_Anchor("A2"))
-        deck.append(Card_Anchor("A3"))
-        deck.append(Card_Anchor("A4"))
-        deck.append(Card_Anchor("A5"))
-        deck.append(Card_Anchor("A6"))
-        deck.append(Card_Anchor("A7"))
+        deck.append(Card_Cannon("B2"))
+        deck.append(Card_Hook("D2"))
+        deck.append(Card_Chest("C2"))
+        deck.append(Card_Key("E2"))
+        deck.append(Card_Kraken("F2"))
+        deck.append(Card_Map("G2"))
+        deck.append(Card_Mermain("H4"))
+        deck.append(Card_Oracle("I2"))
+        deck.append(Card_Sword("J2"))
+        random.shuffle(deck)
+        return deck
 
-        # deck.append(Card_Cannon("B2"))
+    def GenerateCards(self):
+        deck = []
+
+        
+        # deck.append(Card_Anchor("A3"))
+        # deck.append(Card_Anchor("A4"))
+        # deck.append(Card_Anchor("A5"))
+        # deck.append(Card_Anchor("A6"))
+        # deck.append(Card_Anchor("A7"))
+
+        
         # deck.append(Card_Cannon("B3"))
         # deck.append(Card_Cannon("B4"))
         # deck.append(Card_Cannon("B5"))
         # deck.append(Card_Cannon("B6"))
         # deck.append(Card_Cannon("B7"))
 
-        deck.append(Card_Chest("C2"))
+        
         deck.append(Card_Chest("C3"))
         deck.append(Card_Chest("C4"))
         deck.append(Card_Chest("C5"))
         deck.append(Card_Chest("C6"))
         deck.append(Card_Chest("C7"))
 
-        # deck.append(Card_Hook("D2"))
+        
         # deck.append(Card_Hook("D3"))
         # deck.append(Card_Hook("D4"))
         # deck.append(Card_Hook("D5"))
         # deck.append(Card_Hook("D6"))
         # deck.append(Card_Hook("D7"))
 
-        deck.append(Card_Key("E2"))
+        
         deck.append(Card_Key("E3"))
         deck.append(Card_Key("E4"))
         deck.append(Card_Key("E5"))
         deck.append(Card_Key("E6"))
         deck.append(Card_Key("E7"))
 
-        deck.append(Card_Kraken("F2"))
+        
         deck.append(Card_Kraken("F3"))
         deck.append(Card_Kraken("F4"))
         deck.append(Card_Kraken("F5"))
         deck.append(Card_Kraken("F6"))
         deck.append(Card_Kraken("F7"))
 
-        # deck.append(Card_Map("G2"))
+        
         # deck.append(Card_Map("G3"))
         # deck.append(Card_Map("G4"))
         # deck.append(Card_Map("G5"))
         # deck.append(Card_Map("G6"))
         # deck.append(Card_Map("G7"))
 
-        deck.append(Card_Mermain("H4"))
-        deck.append(Card_Mermain("H5"))
-        deck.append(Card_Mermain("H6"))
-        deck.append(Card_Mermain("H7"))
-        deck.append(Card_Mermain("H8"))
-        deck.append(Card_Mermain("H9"))
+        
+        # deck.append(Card_Mermain("H5"))
+        # deck.append(Card_Mermain("H6"))
+        # deck.append(Card_Mermain("H7"))
+        # deck.append(Card_Mermain("H8"))
+        # deck.append(Card_Mermain("H9"))
 
-        # deck.append(Card_Oracle("I2"))
+        
         # deck.append(Card_Oracle("I3"))
         # deck.append(Card_Oracle("I4"))
         # deck.append(Card_Oracle("I5"))
         # deck.append(Card_Oracle("I6"))
         # deck.append(Card_Oracle("I7"))
-        #
-        # deck.append(Card_Sword("J2"))
+        
+        
         # deck.append(Card_Sword("J3"))
         # deck.append(Card_Sword("J4"))
         # deck.append(Card_Sword("J5"))
@@ -113,6 +134,7 @@ class DeadManDrawGame():
         # Shuffle cards, pick a starting guy #
         gameData[str(chatid)]["CurrentPlayer"] = 0
         gameData[str(chatid)]["CardsPile"] = self.GenerateCards()
+        gameData[str(chatid)]["GravePile"]=self.GenerateGravePileCards()
         context.bot.send_message(chat_id=chatid, text="Picked player {} as first player".format(
             gameData[str(chatid)]["JoinListName"][gameData[str(chatid)]["CurrentPlayer"]]))
         gameData[str(chatid)]["PlayerCards"] = [[] for i in range(len(gameData[str(chatid)]["JoinListName"]))]
@@ -128,10 +150,18 @@ class DeadManDrawGame():
 
     def ContinueTurn(self, update, context, chatid, posY, posX, content):
         # ask to draw a card #
-        tools.sendButton(context, update, chatid, "Player {} draw your card, or give up".format(
-            gameData[str(chatid)]["JoinListName"][gameData[str(chatid)]["CurrentPlayer"]]), CALLBACKKEY_DRAWCARD,
-                         [["Draw Card"], ["Give Up"]])
+        if(self.isKrakenOpened!=0):
+            tools.sendButton(context, update, chatid, "Player {} draw your card, or give up".format(
+                gameData[str(chatid)]["JoinListName"][gameData[str(chatid)]["CurrentPlayer"]]), CALLBACKKEY_DRAWCARD,
+                         [["Draw Card"]])
+        else:
+            tools.sendButton(context, update, chatid, "Player {} draw your card, or give up".format(
+                gameData[str(chatid)]["JoinListName"][gameData[str(chatid)]["CurrentPlayer"]]), CALLBACKKEY_DRAWCARD,
+                            [["Draw Card"], ["Give Up"]])
         return
+
+    def SetNewKraken(self,count):
+        self.isKrakenOpened=count
 
     def OpenCard(self, update, context, chatid, posY, posX, content, fromid,gotCard):
         # find any thing to do after opened card #
@@ -166,9 +196,14 @@ class DeadManDrawGame():
         if (status == "Bust"):
             self.CollectBustDeck(chatid, gameData[str(chatid)]["CurrentPlayer"], gotCard)
         elif (status == "GiveUp"):
+            print("Check key chest")
+            if self.CheckContainKeyChestPair(gameData[str(chatid)]["CardsOutside"]):
+                # Has key chest pair, draw 3 card from grave pile
+                print("Has key chest pair")
+                gameData[str(chatid)]["CardsOutside"]=gameData[str(chatid)]["CardsOutside"]+(self.GetRandomCards(3,gameData[str(chatid)]["GravePile"]))
             self.CollectAllDeckToPlayer(chatid, gameData[str(chatid)]["CurrentPlayer"])
-        print("Player:", gameData[str(chatid)]["PlayerCards"][gameData[str(chatid)]["CurrentPlayer"]])
-        print("Grave:", gameData[str(chatid)]["GravePile"])
+        print("Player:", self.CardListToString(gameData[str(chatid)]["PlayerCards"][gameData[str(chatid)]["CurrentPlayer"]]))
+        print("Grave:", self.CardListToString(gameData[str(chatid)]["GravePile"]))
         return
 
     def NextPlayer(self, update, context, chatid, posY, posX, content, fromid):
@@ -182,6 +217,11 @@ class DeadManDrawGame():
     def StartGame(self, update, context):
         super().StartGame(update, context)
         # Start a game
+        return
+
+    def EndGame(self, update, context):
+        print("Game Ended, Counting score now")
+        #TODO: Count score
         return
 
     def showJoinList(self, update, context, chat_id):
@@ -216,9 +256,13 @@ class DeadManDrawGame():
     def DrawCard(self, update, context, chatid, posY, posX, content, fromid):
         # if(fromid==gameData[str(chatid)]["JoinList"][gameData[str(chatid)]["CurrentPlayer"]]):
         if (content == "Draw Card"):
-            gotCard = gameData[str(chatid)]["CardsPile"].pop(0)
-            self.OpenCard(update, context, chatid, posY, posX, content, fromid,gotCard)
-            return True, "Drawed card"
+            if len(gameData[str(chatid)]["CardsPile"])>0:
+                gotCard = gameData[str(chatid)]["CardsPile"].pop(0)
+                self.OpenCard(update, context, chatid, posY, posX, content, fromid,gotCard)
+                return True, "Drawed card"
+            else:
+                self.EndGame(update, context)
+                return True, "End Game"
         elif (content == "Give Up"):
             self.GiveUp(update, context, chatid, posY, posX, content, fromid)
             return True, "Give Up Draw Card"
@@ -260,7 +304,34 @@ class DeadManDrawGame():
                 card = gameData[str(chatid)]["CardsOutside"].pop(0)
                 gameData[str(chatid)]["GravePile"].append(card)
 
+    def GetRandomCards(self, count,cardList):
+        #return a list of cards if exist
+        resultList=[]
+        for i in range(count):
+            if len(cardList)<=0:
+                return resultList
+            ran=random.randint(0,len(cardList)-1)
+            resultList.append(cardList.pop(count))
+            
+        return resultList
 
+    def CheckContainKeyChestPair(self, cardList):
+        #return contain key chest or not
+        hasKey=False
+        hasChest=False
+        for i,x in enumerate(cardList):            
+            if x.skill=="Key":
+                hasKey=True
+            if x.skill=="Chest":
+                hasChest=True
+        return (hasKey and hasChest)
+
+    def CardListToString(self, cardList):
+        string=""
+        for i,x in enumerate(cardList):
+            string=string+x.key+","
+        return string
+    
     @staticmethod
     def displayCard(update, context, targetChatId, queryText, cardList, callBackKey=None, isUniqueTop=False):
         """
@@ -322,10 +393,12 @@ class SkillManager:
         elif callBackKey == "Map":
             graveCardDeck = GeneralCardDeck(graveDeck)
             grabCard = graveCardDeck.remove(selectedCardKey)
+            global mapCount
             mapCount.append(grabCard)
             currentPlayerDeck.append(grabCard)
             resultMessage = "You get card {} from grave.".format(selectedCardKey)
             if len(mapCount) == 3 or not graveCardDeck:
+                global mapCount
                 mapCount.clear()
                 return True, resultMessage
             else:

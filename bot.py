@@ -58,7 +58,7 @@ def show(update,context):
         ac.append(pc.getCardEmojiList())
     update.message.reply_text("Grave: "+str(gc.getCardEmojiList())+"\n"+
                               "Players: "+str(ac)+"\n"+
-                              gameData[str(channleChatId)]["JoinListName"])
+                              ','.join(map(str,gameData[str(channleChatId)]["JoinListName"])))
 
 
 
@@ -76,6 +76,7 @@ def button_callBack(update, context):
     fromid = update.callback_query.from_user.id
     callBackKey, chatid, posY, posX, content = getButtonCallBackData(query)
     exitButtonDisplay, continueTurn = False,False
+    
     if (callBackKey == CALLBACKKEY_CHOOSEGAME):
         exitButtonDisplay, resultText = ChooseGame(update, context, chatid, posY, posX, content, fromid)
     elif (callBackKey == CALLBACKKEY_READYSTART):
@@ -90,8 +91,37 @@ def button_callBack(update, context):
 
         exitButtonDisplay, resultText = SkillManager.DoAction(update,context,chatid,"","",fromid,callBackKey,selectedPlayerId,selectedCardKey,content)
         continueTurn = True
+        # from Cards.Card_Cannon import Card_Cannon
+        # from Cards.Card import Card, Skill
+        # targetPlayerCardDeck = PlayerCardDeck(gameData[str(chatid)]["PlayerCards"][selectedPlayerId])
+        # currentPlayerCardDeck = PlayerCardDeck(CardListType.getCardList(CardListType.OWN_PLAYER, chatid))
+        # graveDeck = CardListType.getCardList(CardListType.GRAVE, chatid)
+        # if callBackKey == Skill.Cannon:
+        #     # put player's card to grave
+        #     targetPlayerCardDeck.remove(selectedCardKey)
+        #
+        #     card = Card_Cannon(selectedCardKey)
+        #     graveDeck.append(card)
+        #
+        #     exitButtonDisplay, resultText = True, "You Use Skill:"+content
+        # elif callBackKey == Skill.Hook:
+        #     currentPlayerCardDeck.remove(selectedCardKey)
+        #     # play selected card
+        # elif callBackKey == Skill.Map:
+        #     graveCardDeck = GeneralCardDeck(graveDeck)
+        #     graveCardDeck.remove(selectedCardKey)
+        #
+        #     # play selected card
+        # elif callBackKey == Skill.Sword:
+        #     targetPlayerCardDeck.remove(selectedCardKey)
+        # elif callBackKey == Skill.Oracle:
+        #     pass
+
     if (exitButtonDisplay == True):
-        query.edit_message_text(text=resultText)
+        query.edit_message_text(text="Selected")
+
+        context.bot.send_message(chat_id=chatid, text=resultText)
+        # query.edit_message_text(text=resultText)
     if continueTurn == True:
         game.ContinueTurn(update, context, chatid, posY, posX, content)
 
