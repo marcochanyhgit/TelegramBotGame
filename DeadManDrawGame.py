@@ -11,7 +11,7 @@ from Cards.Card_Map import Card_Map
 from Cards.Card_Mermain import Card_Mermain
 from Cards.Card_Oracle import Card_Oracle
 from Cards.Card_Sword import Card_Sword
-from settings import game, gameData, CALLBACKKEY_READYSTART, CALLBACKKEY_DRAWCARD, CardListType
+from settings import game, gameData, CALLBACKKEY_READYSTART, CALLBACKKEY_DRAWCARD, CardListType, mapCount
 import tools
 from PlayerCardDeck import PlayerCardDeck, GeneralCardDeck
 #   Built-in function
@@ -296,13 +296,12 @@ class DeadManDrawGame():
 
 class SkillManager:
     @staticmethod
-    def DoAction( update,context,chatid,posY,posX,fromid,callBackKey,selectedPlayerId,selectedCardKey):
-        from Cards.Card_Cannon import Card_Cannon
-        from Cards.Card import Card, Skill
+    def DoAction( update,context,chatid,posY,posX,fromid,callBackKey,selectedPlayerId,selectedCardKey,content):
         print(gameData[str(chatid)]["PlayerCards"])
         targetPlayerCardDeck = PlayerCardDeck(gameData[str(chatid)]["PlayerCards"][selectedPlayerId])
         _,currentPlayerDeck = CardListType.getCardList(CardListType.OWN_PLAYER,chatid)
         currentPlayerCardDeck = PlayerCardDeck(currentPlayerDeck)
+        cardDeck = CardListType.getCardList(CardListType.DECK,chatid)
         graveDeck = CardListType.getCardList(CardListType.GRAVE, chatid)
 
         if callBackKey == "Cannon":
@@ -315,18 +314,29 @@ class SkillManager:
             return True , resultMessage
         elif callBackKey == "Hook":
             grabCard = currentPlayerCardDeck.remove(selectedCardKey)
-            DeadManDrawGame.OpenCard(update,context,chatid,posY,posX,
+            game.OpenCard(update,context,chatid,posY,posX,
                                      content=callBackKey,
                                      fromid=fromid,
                                      gotCard=grabCard)
             #play selected card
         elif callBackKey == "Map":
             graveCardDeck = GeneralCardDeck(graveDeck)
-            graveCardDeck.remove(selectedCardKey)
-
+            grabCard = graveCardDeck.remove(selectedCardKey)
+            mapCount.append(grabCard)
+            currentPlayerDeck.append(grabCard)
+            resultMessage = "You get card {} from grave.".format(selectedCardKey)
+            if len(mapCount) == 3 or not graveCardDeck:
+                mapCount.clear()
+                return True, resultMessage
+            else:
+                gameData[str(chatid)]["CardsOutside"][-1].OpenAction(update,context,chatid,posY,posX,content,
+                    gameData[str(chatid)]["JoinListName"][gameData[str(chatid)]["CurrentPlayer"]],game)
             #play selected card
         elif callBackKey == "Sword":
-             targetPlayerCardDeck.remove(selectedCardKey)
+             grabCard = targetPlayerCardDeck.remove(selectedCardKey)
+             game.OpenCard(update,context,chatid,posY,posX,
+                                      content=callBackKey,
+                                      fromid=fromid,
+                                      gotCard=grabCard)
         elif callBackKey == "Oracle":
             pass
-

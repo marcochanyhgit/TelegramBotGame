@@ -88,33 +88,8 @@ def button_callBack(update, context):
         selectedCardKey = content
         selectedPlayerId = posY
 
-        exitButtonDisplay, resultText = SkillManager.DoAction(update,context,chatid,"","",fromid,callBackKey,selectedPlayerId,selectedCardKey)
+        exitButtonDisplay, resultText = SkillManager.DoAction(update,context,chatid,"","",fromid,callBackKey,selectedPlayerId,selectedCardKey,content)
         continueTurn = True
-        # from Cards.Card_Cannon import Card_Cannon
-        # from Cards.Card import Card, Skill
-        # targetPlayerCardDeck = PlayerCardDeck(gameData[str(chatid)]["PlayerCards"][selectedPlayerId])
-        # currentPlayerCardDeck = PlayerCardDeck(CardListType.getCardList(CardListType.OWN_PLAYER, chatid))
-        # graveDeck = CardListType.getCardList(CardListType.GRAVE, chatid)
-        # if callBackKey == Skill.Cannon:
-        #     # put player's card to grave
-        #     targetPlayerCardDeck.remove(selectedCardKey)
-        #
-        #     card = Card_Cannon(selectedCardKey)
-        #     graveDeck.append(card)
-        #
-        #     exitButtonDisplay, resultText = True, "You Use Skill:"+content
-        # elif callBackKey == Skill.Hook:
-        #     currentPlayerCardDeck.remove(selectedCardKey)
-        #     # play selected card
-        # elif callBackKey == Skill.Map:
-        #     graveCardDeck = GeneralCardDeck(graveDeck)
-        #     graveCardDeck.remove(selectedCardKey)
-        #
-        #     # play selected card
-        # elif callBackKey == Skill.Sword:
-        #     targetPlayerCardDeck.remove(selectedCardKey)
-        # elif callBackKey == Skill.Oracle:
-        #     pass
     if (exitButtonDisplay == True):
         query.edit_message_text(text=resultText)
     if continueTurn == True:
