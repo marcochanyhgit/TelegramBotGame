@@ -134,7 +134,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 # ----- Startup calls ----- #
-botToken = "1043079672:AAGKrVHxXkROQTZG-T9CQ0gyjGw4hzEls5s"
+botToken = ""
 updater = Updater(botToken, use_context=True)
 updater.dispatcher.add_handler(CommandHandler('start', start))
 updater.dispatcher.add_handler(CallbackQueryHandler(button_callBack))
