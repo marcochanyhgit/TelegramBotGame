@@ -90,7 +90,7 @@ def button_callBack(update, context):
         selectedCardKey = content
         selectedPlayerId = posY
 
-        exitButtonDisplay, resultText = SkillManager.DoAction(update,context,chatid,"","",fromid,callBackKey,selectedPlayerId,selectedCardKey)
+        exitButtonDisplay, resultText = SkillManager.DoAction(update,context,chatid,"","",fromid,callBackKey,selectedPlayerId,selectedCardKey,content)
         continueTurn = True
         # from Cards.Card_Cannon import Card_Cannon
         # from Cards.Card import Card, Skill

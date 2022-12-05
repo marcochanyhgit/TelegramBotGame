@@ -1,7 +1,9 @@
 global gameData
 global game
+global mapCount
 gameData = {}
 game = None
+mapCount = []
 
 CALLBACKKEY_CHOOSEGAME = "Choose Game"
 CALLBACKKEY_READYSTART = "Ready Start"
