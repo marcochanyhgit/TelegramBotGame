@@ -398,7 +398,6 @@ class SkillManager:
             currentPlayerDeck.append(grabCard)
             resultMessage = "You get card {} from grave.".format(selectedCardKey)
             if len(mapCount) == 3 or not graveCardDeck:
-                global mapCount
                 mapCount.clear()
                 return True, resultMessage
             else:
