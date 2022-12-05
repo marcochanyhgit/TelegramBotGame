@@ -1,6 +1,7 @@
 import os
 
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
+from dotenv import load_dotenv
 import logging
 import random
 
@@ -134,7 +135,8 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 # ----- Startup calls ----- #
-botToken = "1043079672:AAGKrVHxXkROQTZG-T9CQ0gyjGw4hzEls5s"
+load_dotenv()
+botToken = os.getenv("botToken", default=None)  
 updater = Updater(botToken, use_context=True)
 updater.dispatcher.add_handler(CommandHandler('start', start))
 updater.dispatcher.add_handler(CallbackQueryHandler(button_callBack))
