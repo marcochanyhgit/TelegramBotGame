@@ -57,76 +57,17 @@ class DeadManDrawGame():
     def GenerateCards(self):
         deck = []
 
+        # deck.append([Card_Anchor("A3"),Card_Anchor("A4"),Card_Anchor("A5"),Card_Anchor("A6"),Card_Anchor("A7")])
+        # deck.append([Card_Cannon("B3"),Card_Cannon("B4"),Card_Cannon("B5"),Card_Cannon("B6"),Card_Cannon("B7")])
+        deck.append([Card_Chest("C3"),Card_Chest("C4"),Card_Chest("C5"),Card_Chest("C6"),Card_Chest("C7")])
+        # deck.append([Card_Hook("D3"),Card_Hook("D4"),Card_Hook("D5"),Card_Hook("D6"),Card_Hook("D7")])
+        deck.append([Card_Key("E3"),Card_Key("E4"),Card_Key("E5"),Card_Key("E6"),Card_Key("E7")])
+        deck.append([Card_Kraken("F3"),Card_Kraken("F4"),Card_Kraken("F5"),Card_Kraken("F6"),Card_Kraken("F7")])
+        # deck.append([Card_Map("G3"),Card_Map("G4"),Card_Map("G5"),Card_Map("G6"),Card_Map("G7")])        
+        # deck.append([Card_Mermain("H5"),Card_Mermain("H6"),Card_Mermain("H7"),Card_Mermain("H8"),Card_Mermain("H9")])        
+        # deck.append([Card_Oracle("I3"),Card_Oracle("I4"),Card_Oracle("I5"),Card_Oracle("I6"),Card_Oracle("I7")])        
+        # deck.append([Card_Sword("J3"),Card_Sword("J4"),Card_Sword("J5"),Card_Sword("J6"),Card_Sword("J7")])
         
-        # deck.append(Card_Anchor("A3"))
-        # deck.append(Card_Anchor("A4"))
-        # deck.append(Card_Anchor("A5"))
-        # deck.append(Card_Anchor("A6"))
-        # deck.append(Card_Anchor("A7"))
-
-        
-        # deck.append(Card_Cannon("B3"))
-        # deck.append(Card_Cannon("B4"))
-        # deck.append(Card_Cannon("B5"))
-        # deck.append(Card_Cannon("B6"))
-        # deck.append(Card_Cannon("B7"))
-
-        
-        deck.append(Card_Chest("C3"))
-        deck.append(Card_Chest("C4"))
-        deck.append(Card_Chest("C5"))
-        deck.append(Card_Chest("C6"))
-        deck.append(Card_Chest("C7"))
-
-        
-        # deck.append(Card_Hook("D3"))
-        # deck.append(Card_Hook("D4"))
-        # deck.append(Card_Hook("D5"))
-        # deck.append(Card_Hook("D6"))
-        # deck.append(Card_Hook("D7"))
-
-        
-        deck.append(Card_Key("E3"))
-        deck.append(Card_Key("E4"))
-        deck.append(Card_Key("E5"))
-        deck.append(Card_Key("E6"))
-        deck.append(Card_Key("E7"))
-
-        
-        deck.append(Card_Kraken("F3"))
-        deck.append(Card_Kraken("F4"))
-        deck.append(Card_Kraken("F5"))
-        deck.append(Card_Kraken("F6"))
-        deck.append(Card_Kraken("F7"))
-
-        
-        # deck.append(Card_Map("G3"))
-        # deck.append(Card_Map("G4"))
-        # deck.append(Card_Map("G5"))
-        # deck.append(Card_Map("G6"))
-        # deck.append(Card_Map("G7"))
-
-        
-        # deck.append(Card_Mermain("H5"))
-        # deck.append(Card_Mermain("H6"))
-        # deck.append(Card_Mermain("H7"))
-        # deck.append(Card_Mermain("H8"))
-        # deck.append(Card_Mermain("H9"))
-
-        
-        # deck.append(Card_Oracle("I3"))
-        # deck.append(Card_Oracle("I4"))
-        # deck.append(Card_Oracle("I5"))
-        # deck.append(Card_Oracle("I6"))
-        # deck.append(Card_Oracle("I7"))
-        
-        
-        # deck.append(Card_Sword("J3"))
-        # deck.append(Card_Sword("J4"))
-        # deck.append(Card_Sword("J5"))
-        # deck.append(Card_Sword("J6"))
-        # deck.append(Card_Sword("J7"))
-
         random.shuffle(deck)
         return deck
 
